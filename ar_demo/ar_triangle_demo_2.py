@@ -74,7 +74,7 @@ class Tracker(object):
         ret, rvec, tvec = cv2.solvePnP(quad_3d, tracked.quad, K, dist_coef)
         self.time_counter += 1
         if not self.time_counter % 20:
-            self.graphics_counter = (self.graphics_counter+1) % 8
+            self.graphics_counter = (self.graphics_counter + 1) % 8
 
         self.overlay_vertices = np.float32([[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0],
                                             [0.5, 0.5, self.graphics_counter]])

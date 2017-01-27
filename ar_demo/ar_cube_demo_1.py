@@ -5,6 +5,7 @@ import numpy as np
 
 from ar_demo.pose_estimator import PoseEstimator
 from ar_demo.utils import ROISelector
+from ar_demo.primitives import Cube
 
 
 logger = logging.getLogger(__name__)
@@ -21,9 +22,7 @@ class Tracker(object):
         self.tracker = PoseEstimator()
         cv2.namedWindow(WIN_NAME)
         self.roi_selector = ROISelector(WIN_NAME, self.on_rect)
-        self.overlay_vertices = np.float32([[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0],
-                                            [0.5, 0.5, 4]])
-        self.overlay_edges = [(0, 1), (1, 2), (2, 3), (3, 0), (0, 4), (1, 4), (2, 4), (3, 4)]
+        self.primitive = Cube()
         self.color_base = (0, 255, 0)
         self.color_lines = (0, 0, 0)
 
@@ -70,8 +69,8 @@ class Tracker(object):
                         [0, 0, 1.0]])
         dist_coef = np.zeros(4)
         ret, rvec, tvec = cv2.solvePnP(quad_3d, tracked.quad, K, dist_coef)
-        verts = self.overlay_vertices * [(x_end-x_start), (y_end-y_start),
-                                         -(x_end-x_start)*0.3] + (x_start, y_start, 0)
+        verts = self.primitive.get_vertices() * [(x_end-x_start), (y_end-y_start),
+                                                 -(x_end-x_start)*0.3] + (x_start, y_start, 0)
         verts = cv2.projectPoints(verts, rvec, tvec, K, dist_coef)[0].reshape(-1, 2)
 
         verts_floor = np.int32(verts).reshape(-1, 2)
@@ -84,7 +83,7 @@ class Tracker(object):
                          (0, 0, 150), -3)
         cv2.drawContours(img, [np.vstack((verts_floor[3:4], verts_floor[0:1], verts_floor[4:5]))],
                          -1, (255, 255, 0), -3)
-        for i, j in self.overlay_edges:
+        for i, j in self.primitive.get_edges():
             (x_start, y_start), (x_end, y_end) = verts[i], verts[j]
             cv2.line(img, (int(x_start), int(y_start)), (int(x_end), int(y_end)),
                      self.color_lines, 2)

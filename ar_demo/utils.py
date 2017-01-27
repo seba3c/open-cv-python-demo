@@ -7,9 +7,12 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
+COLOR_YELLOW = (0, 255, 255)
 COLOR_BLUE = (255, 0, 0)
 COLOR_RED = (0, 0, 255)
 COLOR_GREEN = (0, 255, 0)
+COLOR_BLACK = (0, 0, 0)
+COLOR_WHITE = (255, 255, 255)
 
 
 class ROISelector(object):
