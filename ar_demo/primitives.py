@@ -11,6 +11,10 @@ class Primitive():
             self.vertices_asfloat32 = np.float32(self.vertices)
         return self.vertices_asfloat32
 
+    def set_vertices(self, vertices):
+        self.vertices_asfloat32 = None
+        self.vertices = vertices
+
     def get_edges(self):
         return self.edges
 
