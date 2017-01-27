@@ -57,5 +57,5 @@ class VideoHandler(object):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    logger.debug("Starting plannar object tracking demo...")
+    logger.debug("Starting planar object tracking demo...")
     VideoHandler().start()
