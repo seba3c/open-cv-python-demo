@@ -13,6 +13,7 @@ COLOR_RED = (0, 0, 255)
 COLOR_GREEN = (0, 255, 0)
 COLOR_BLACK = (0, 0, 0)
 COLOR_WHITE = (255, 255, 255)
+COLOR_ORANGE = (0, 153, 255)
 
 
 class ROISelector(object):

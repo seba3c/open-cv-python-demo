@@ -4,7 +4,8 @@ import cv2
 import numpy as np
 
 from ar_demo.pose_estimator import PoseEstimator
-from ar_demo.utils import ROISelector
+from ar_demo.utils import (ROISelector, COLOR_BLACK, COLOR_GREEN, COLOR_ORANGE,
+                           COLOR_BLUE, COLOR_RED, COLOR_WHITE, COLOR_YELLOW)
 from ar_demo.primitives import Cube
 
 
@@ -23,8 +24,7 @@ class Tracker(object):
         cv2.namedWindow(WIN_NAME)
         self.roi_selector = ROISelector(WIN_NAME, self.on_rect)
         self.primitive = Cube()
-        self.color_base = (0, 255, 0)
-        self.color_lines = (0, 0, 0)
+        self.color_lines = COLOR_BLACK
 
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)
@@ -44,9 +44,9 @@ class Tracker(object):
             if is_running:
                 tracked = self.tracker.track_target(self.frame)
                 for item in tracked:
-                    cv2.polylines(img, [np.int32(item.quad)], True, self.color_lines, 2)
-                    for (x, y) in np.int32(item.points_cur):
-                        cv2.circle(img, (x, y), 2, self.color_lines)
+                    # cv2.polylines(img, [np.int32(item.quad)], True, self.color_lines, 2)
+                    # for (x, y) in np.int32(item.points_cur):
+                    #    cv2.circle(img, (x, y), 2, self.color_lines)
                     self.overlay_graphics(img, item)
 
             self.roi_selector.draw_rect(img)
@@ -70,19 +70,38 @@ class Tracker(object):
         dist_coef = np.zeros(4)
         ret, rvec, tvec = cv2.solvePnP(quad_3d, tracked.quad, K, dist_coef)
         verts = self.primitive.get_vertices() * [(x_end-x_start), (y_end-y_start),
-                                                 -(x_end-x_start)*0.3] + (x_start, y_start, 0)
+                                                 -(x_end-x_start)] + (x_start, y_start, 0)
         verts = cv2.projectPoints(verts, rvec, tvec, K, dist_coef)[0].reshape(-1, 2)
 
         verts_floor = np.int32(verts).reshape(-1, 2)
-        cv2.drawContours(img, [verts_floor[:4]], -1, self.color_base, -3)
-        cv2.drawContours(img, [np.vstack((verts_floor[:2], verts_floor[4:5]))], -1,
-                         (0, 255, 0), -3)
-        cv2.drawContours(img, [np.vstack((verts_floor[1:3], verts_floor[4:5]))], -1,
-                         (255, 0, 0), -3)
-        cv2.drawContours(img, [np.vstack((verts_floor[2:4], verts_floor[4:5]))], -1,
-                         (0, 0, 150), -3)
-        cv2.drawContours(img, [np.vstack((verts_floor[3:4], verts_floor[0:1], verts_floor[4:5]))],
-                         -1, (255, 255, 0), -3)
+
+        cv2.drawContours(img, [verts_floor[0:4]], -1, COLOR_ORANGE, -3)
+
+        cv2.drawContours(img,
+                         [np.vstack((verts_floor[1], verts_floor[2],
+                                     verts_floor[7], verts_floor[5]))],
+                         -1, COLOR_ORANGE, -3)
+
+        cv2.drawContours(img,
+                         [np.vstack((verts_floor[0], verts_floor[3],
+                                     verts_floor[6], verts_floor[4]))],
+                         -1, COLOR_ORANGE, -3)
+
+        cv2.drawContours(img,
+                         [np.vstack((verts_floor[2], verts_floor[3],
+                                     verts_floor[6], verts_floor[7]))],
+                         -1, COLOR_ORANGE, -3)
+
+        cv2.drawContours(img,
+                         [np.vstack((verts_floor[0], verts_floor[1],
+                                     verts_floor[5], verts_floor[4]))],
+                         -1, COLOR_ORANGE, -3)
+
+        cv2.drawContours(img,
+                         [np.vstack((verts_floor[4], verts_floor[5],
+                                     verts_floor[7], verts_floor[6]))],
+                         -1, COLOR_ORANGE, -3)
+
         for i, j in self.primitive.get_edges():
             (x_start, y_start), (x_end, y_end) = verts[i], verts[j]
             cv2.line(img, (int(x_start), int(y_start)), (int(x_end), int(y_end)),
